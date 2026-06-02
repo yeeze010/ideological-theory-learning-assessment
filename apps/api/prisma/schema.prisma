@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String
+  code      String   @unique
+  status    String   @default("enabled")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orgs    Org[]
+  users   User[]
+  courses Course[]
+}
+
+model Org {
+  id        String   @id @default(uuid())
+  tenantId  String
+  parentId  String?
+  name      String
+  sort      Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  users  User[]
+
+  @@index([tenantId, parentId])
+}
+
+model User {
+  id           String   @id @default(uuid())
+  tenantId     String
+  orgId        String
+  username     String
+  passwordHash String
+  name         String
+  status       String   @default("enabled")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  org    Org    @relation(fields: [orgId], references: [id])
+
+  @@unique([tenantId, username])
+  @@index([tenantId, orgId])
+}
+
+model Course {
+  id              String   @id @default(uuid())
+  tenantId        String
+  title           String
+  category        String
+  status          String   @default("draft")
+  requiredMinutes Int      @default(60)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenant   Tenant          @relation(fields: [tenantId], references: [id])
+  chapters CourseChapter[]
+  exams    ExamPlan[]
+
+  @@index([tenantId, status])
+}
+
+model CourseChapter {
+  id              String   @id @default(uuid())
+  courseId        String
+  title           String
+  sort            Int      @default(0)
+  requiredMinutes Int      @default(20)
+
+  course Course @relation(fields: [courseId], references: [id])
+}
+
+model Question {
+  id         String   @id @default(uuid())
+  bankName   String
+  type       String
+  difficulty String
+  stem       String
+  options    Json
+  answer     Json
+  score      Int      @default(10)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([bankName, type, difficulty])
+}
+
+model ExamPlan {
+  id              String   @id @default(uuid())
+  courseId        String
+  title           String
+  status          String   @default("draft")
+  startAt         DateTime
+  endAt           DateTime
+  durationMinutes Int
+  passScore       Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  course   Course        @relation(fields: [courseId], references: [id])
+  attempts ExamAttempt[]
+}
+
+model ExamAttempt {
+  id          String    @id @default(uuid())
+  examPlanId  String
+  userId      String
+  answers     Json
+  totalScore  Int       @default(0)
+  passed      Boolean   @default(false)
+  startedAt   DateTime  @default(now())
+  submittedAt DateTime?
+
+  examPlan ExamPlan @relation(fields: [examPlanId], references: [id])
+
+  @@index([examPlanId, userId])
+}
