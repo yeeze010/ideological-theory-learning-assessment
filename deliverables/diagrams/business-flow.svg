@@ -1,0 +1,113 @@
+<svg viewBox="0 0 980 880" xmlns="http://www.w3.org/2000/svg">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap');
+text { font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', sans-serif; }
+.title { fill:#f8fafc; font-size:18px; font-weight:700; }
+.sub { fill:#94a3b8; font-size:9px; }
+.label { fill:#f8fafc; font-size:12px; font-weight:600; }
+.small { fill:#cbd5e1; font-size:9px; }
+.tiny { fill:#94a3b8; font-size:8px; }
+.region { fill:none; stroke:#fbbf24; stroke-width:1; stroke-dasharray:8 4; }
+.line { fill:none; stroke:#64748b; stroke-width:1.4; marker-end:url(#arrow); }
+.lineCyan { fill:none; stroke:#22d3ee; stroke-width:1.6; marker-end:url(#arrow-cyan); }
+.lineGreen { fill:none; stroke:#34d399; stroke-width:1.6; marker-end:url(#arrow-green); }
+.lineRose { fill:none; stroke:#fb7185; stroke-width:1.4; stroke-dasharray:6 4; marker-end:url(#arrow-rose); }
+</style>
+
+<defs>
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+  </pattern>
+  <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+  </marker>
+  <marker id="arrow-cyan" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#22d3ee"/>
+  </marker>
+  <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#34d399"/>
+  </marker>
+  <marker id="arrow-rose" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#fb7185"/>
+  </marker>
+</defs>
+
+<rect width="980" height="880" fill="#0f172a"/><rect width="980" height="880" fill="url(#grid)"/>
+<text x="30" y="38" class="title">业务流程图 - 从课程建设到验收归档</text>
+<text x="30" y="56" class="sub">主线：资源建设 -> 任务发布 -> 学习考试 -> 评分证书 -> 报表归档</text>
+
+
+<rect x="390" y="85" width="200" height="52" rx="6" fill="#0f172a"/>
+<rect x="390" y="85" width="200" height="52" rx="6" fill="rgba(59,130,246,0.3)" stroke="#60a5fa" stroke-width="1.5"/>
+<text x="490.0" y="110" class="label" text-anchor="middle">开始：制定学习计划</text>
+<text x="490.0" y="128" class="small" text-anchor="middle">组织管理员配置范围</text>
+
+
+<rect x="390" y="175" width="200" height="56" rx="6" fill="#0f172a"/>
+<rect x="390" y="175" width="200" height="56" rx="6" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+<text x="490.0" y="200" class="label" text-anchor="middle">创建课程与章节</text>
+<text x="490.0" y="218" class="small" text-anchor="middle">课程管理员上传资源</text>
+
+
+<rect x="390" y="270" width="200" height="56" rx="6" fill="#0f172a"/>
+<rect x="390" y="270" width="200" height="56" rx="6" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="1.5"/>
+<text x="490.0" y="295" class="label" text-anchor="middle">维护题库与试卷</text>
+<text x="490.0" y="313" class="small" text-anchor="middle">题库管理员导入试题</text>
+
+<g transform="translate(490,385)">
+  <polygon points="0,-42 70,0 0,42 -70,0" fill="#0f172a"/>
+  <polygon points="0,-42 70,0 0,42 -70,0" fill="rgba(120,53,15,0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+  <text y="-5" class="label" text-anchor="middle">是否审核通过</text>
+  <text y="13" class="small" text-anchor="middle">内容/题库</text>
+</g>
+
+<rect x="690" y="355" width="180" height="56" rx="6" fill="#0f172a"/>
+<rect x="690" y="355" width="180" height="56" rx="6" fill="rgba(136,19,55,0.4)" stroke="#fb7185" stroke-width="1.5"/>
+<text x="780.0" y="380" class="label" text-anchor="middle">退回修改</text>
+<text x="780.0" y="398" class="small" text-anchor="middle">记录审核意见</text>
+
+
+<rect x="390" y="485" width="200" height="56" rx="6" fill="#0f172a"/>
+<rect x="390" y="485" width="200" height="56" rx="6" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+<text x="490.0" y="510" class="label" text-anchor="middle">发布学习与考试任务</text>
+<text x="490.0" y="528" class="small" text-anchor="middle">范围/时间/规则</text>
+
+
+<rect x="390" y="585" width="200" height="56" rx="6" fill="#0f172a"/>
+<rect x="390" y="585" width="200" height="56" rx="6" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="1.5"/>
+<text x="490.0" y="610" class="label" text-anchor="middle">学员学习并参加考试</text>
+<text x="490.0" y="628" class="small" text-anchor="middle">进度/答题自动保存</text>
+
+
+<rect x="390" y="685" width="200" height="56" rx="6" fill="#0f172a"/>
+<rect x="390" y="685" width="200" height="56" rx="6" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="1.5"/>
+<text x="490.0" y="710" class="label" text-anchor="middle">评分、发布成绩、生成证书</text>
+<text x="490.0" y="728" class="small" text-anchor="middle">客观题自动评分</text>
+
+
+<rect x="390" y="785" width="200" height="52" rx="6" fill="#0f172a"/>
+<rect x="390" y="785" width="200" height="52" rx="6" fill="rgba(59,130,246,0.3)" stroke="#60a5fa" stroke-width="1.5"/>
+<text x="490.0" y="810" class="label" text-anchor="middle">结束：报表归档验收</text>
+<text x="490.0" y="828" class="small" text-anchor="middle">导出与审计留痕</text>
+
+
+<path d="M490 137 L490 175" class="lineCyan"/>
+<path d="M490 231 L490 270" class="lineCyan"/>
+<path d="M490 326 L490 343" class="lineCyan"/>
+<path d="M560 385 L690 385" class="lineRose"/><text x="610" y="376" fill="#fb7185" font-size="9">否</text>
+<path d="M780 355 L780 205 L590 205" class="lineRose"/>
+<path d="M490 427 L490 485" class="lineGreen"/><text x="505" y="462" fill="#34d399" font-size="9">是</text>
+<path d="M490 541 L490 585" class="lineGreen"/>
+<path d="M490 641 L490 685" class="lineGreen"/>
+<path d="M490 741 L490 785" class="lineGreen"/>
+
+<rect x="50" y="585" width="230" height="165" rx="10" fill="rgba(30,41,59,0.5)" stroke="#94a3b8"/>
+<text x="165" y="612" class="label" text-anchor="middle">异常处理</text>
+<text x="70" y="638" class="small">1. 未学完：提醒与督学</text>
+<text x="70" y="662" class="small">2. 未通过：进入补考</text>
+<text x="70" y="686" class="small">3. 答题异常：审计记录</text>
+<text x="70" y="710" class="small">4. 主观题：人工阅卷</text>
+<path d="M390 610 L280 650" class="line"/>
+<path d="M280 710 L390 710" class="line"/>
+</svg>
