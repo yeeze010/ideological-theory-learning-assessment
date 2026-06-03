@@ -4,6 +4,7 @@ import type {
   ExamEntry,
   ExamPlanSummary,
   ExamResult,
+  AuditLogItem,
   QuestionSummary,
   UserProfile
 } from "@assessment/shared";
@@ -59,11 +60,26 @@ export const api = {
   courses() {
     return request<CourseSummary[]>("/courses");
   },
+  createCourse(payload: { title: string; category: string; requiredMinutes: number }) {
+    return request<CourseSummary>("/courses", {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+  },
   questions() {
     return request<QuestionSummary[]>("/questions");
   },
+  createQuestion(payload: { bankName: string; stem: string; options: string[]; answer: string[]; score: number }) {
+    return request<QuestionSummary>("/questions", {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+  },
   exams() {
     return request<ExamPlanSummary[]>("/exam-plans");
+  },
+  auditLogs() {
+    return request<AuditLogItem[]>("/audit-logs");
   },
   examEntry(examId: string) {
     return request<ExamEntry>(`/exam-plans/${examId}/entry`);

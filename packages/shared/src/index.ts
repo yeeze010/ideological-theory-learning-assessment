@@ -84,3 +84,13 @@ export interface ExamResult {
     correct: boolean;
   }>;
 }
+
+export interface AuditLogItem {
+  id: string;
+  actorName: string;
+  action: string;
+  resourceType: string;
+  resourceName: string;
+  createdAt: string;
+  ip: string;
+}

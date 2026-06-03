@@ -58,6 +58,13 @@ export class AssessmentController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
+  @Get("audit-logs")
+  listAuditLogs() {
+    return this.service.listAuditLogs();
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Get("exam-plans/:id/entry")
   examEntry(@Param("id") id: string) {
     return this.service.examEntry(id);

@@ -7,6 +7,7 @@ import type {
   ExamPlanSummary,
   ExamQuestion,
   ExamResult,
+  AuditLogItem,
   QuestionSummary,
   UserProfile
 } from "@assessment/shared";
@@ -124,6 +125,39 @@ export class AssessmentService {
     }
   ];
 
+  private auditLogs: AuditLogItem[] = [
+    {
+      id: "audit-1",
+      actorName: "系统管理员",
+      action: "发布考试计划",
+      resourceType: "exam_plan",
+      resourceName: "思政理论阶段性考核",
+      createdAt: "2026-06-02T09:12:00+08:00",
+      ip: "127.0.0.1"
+    },
+    {
+      id: "audit-2",
+      actorName: "张同学",
+      action: "进入考试",
+      resourceType: "exam_attempt",
+      resourceName: "思政理论阶段性考核",
+      createdAt: "2026-06-02T10:01:00+08:00",
+      ip: "127.0.0.1"
+    }
+  ];
+
+  private writeAudit(actorName: string, action: string, resourceType: string, resourceName: string) {
+    this.auditLogs.unshift({
+      id: `audit-${Date.now()}`,
+      actorName,
+      action,
+      resourceType,
+      resourceName,
+      createdAt: new Date().toISOString(),
+      ip: "127.0.0.1"
+    });
+  }
+
   login(username: string, password: string) {
     const user = this.users.find((item) => item.username === username && item.password === password);
     if (!user) {
@@ -169,6 +203,7 @@ export class AssessmentService {
       learnerCount: 0
     };
     this.courses.unshift(course);
+    this.writeAudit("系统管理员", "创建课程", "course", course.title);
     return course;
   }
 
@@ -177,20 +212,18 @@ export class AssessmentService {
   }
 
   createQuestion(dto: CreateQuestionDto) {
-    const answer = Object.entries(dto.answer)
-      .filter(([, selected]) => selected)
-      .map(([option]) => option);
     const question: SeedQuestion = {
       id: `q-${this.questions.length + 1}`,
       bankName: dto.bankName,
-      type: answer.length > 1 ? "multiple" : "single",
+      type: dto.answer.length > 1 ? "multiple" : "single",
       difficulty: "medium",
       stem: dto.stem,
       options: dto.options,
-      answer,
-      score: 20
+      answer: dto.answer,
+      score: Number(dto.score ?? 20)
     };
     this.questions.unshift(question);
+    this.writeAudit("题库管理员", "新增试题", "question", question.stem);
     return question;
   }
 
@@ -224,12 +257,18 @@ export class AssessmentService {
       };
     });
     const totalScore = details.reduce((sum, item) => sum + item.score, 0);
-    return {
+    const result = {
       attemptId,
       totalScore,
       passed: totalScore >= this.exams[0].passScore,
       submittedAt: new Date().toISOString(),
       details
     };
+    this.writeAudit("张同学", "提交试卷", "exam_attempt", `${this.exams[0].title}：${totalScore}分`);
+    return result;
+  }
+
+  listAuditLogs() {
+    return this.auditLogs.slice(0, 20);
   }
 }

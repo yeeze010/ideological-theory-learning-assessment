@@ -35,8 +35,11 @@ export class CreateQuestionDto {
   @IsArray()
   options!: string[];
 
-  @IsObject()
-  answer!: Record<string, boolean>;
+  @IsArray()
+  answer!: string[];
+
+  @IsOptional()
+  score?: number;
 }
 
 export class SubmitExamDto {
