@@ -5,7 +5,12 @@ import type {
   ExamPlanSummary,
   ExamResult,
   AuditLogItem,
+  LearningAlert,
+  LearningProfile,
+  LearningRecommendation,
   QuestionSummary,
+  ReviewTask,
+  RoleCode,
   UserProfile
 } from "@assessment/shared";
 
@@ -48,10 +53,10 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 }
 
 export const api = {
-  login(username: string, password: string) {
+  login(role: RoleCode, username: string, password: string) {
     return request<LoginResponse>("/auth/login", {
       method: "POST",
-      body: JSON.stringify({ username, password })
+      body: JSON.stringify({ role, username, password })
     });
   },
   overview() {
@@ -88,6 +93,23 @@ export const api = {
     return request<ExamResult>(`/exam-attempts/${attemptId}/submit`, {
       method: "POST",
       body: JSON.stringify({ answers })
+    });
+  },
+  learningProfile() {
+    return request<LearningProfile>("/learning/profile");
+  },
+  learningRecommendations() {
+    return request<LearningRecommendation[]>("/learning/recommendations");
+  },
+  learningAlerts() {
+    return request<LearningAlert[]>("/learning/alerts");
+  },
+  pendingReviews() {
+    return request<ReviewTask[]>("/reviews/pending");
+  },
+  approveReview(id: string) {
+    return request<ReviewTask>(`/reviews/${id}/approve`, {
+      method: "POST"
     });
   }
 };

@@ -1,101 +1,73 @@
 # 思政理论学习考核评价系统
 
-本项目用于建设“思想理论学习考核平台”，覆盖学习任务发布、课程学习、在线考试、题库管理、自动阅卷、学习积分、考核评价、班级/院系统计、证书生成和学习报告等业务。
+面向高校思想理论学习的教学、考试、评价和治理模块。系统按角色隔离学习端、教师端、题库端和管理分析端，覆盖学习任务、课程章节、题库组卷、在线考试、学习画像、薄弱知识点诊断、材料推荐、学习预警、审核闭环与审计留痕。
 
 ## 技术栈
 
 - 前端：Vue 3 + TypeScript + Vite + Pinia + Vue Router + Element Plus
 - 后端：NestJS + TypeScript
-- 数据库：PostgreSQL，当前 MVP 提供 Prisma schema
-- 缓存：Redis
-- 文件存储：MinIO
-- 部署：Docker + Nginx
-- 协作：Git + GitHub + Issue + Pull Request + GitHub Actions + Release
+- 数据模型：Prisma + PostgreSQL 目标 schema
+- 部署编排：Docker Compose + Nginx
 
-## 仓库结构
+## 本地端口
 
-```text
-apps/
-  api/              NestJS API
-  web/              Vue 3 前端
-packages/
-  shared/           前后端共享类型
-deliverables/       项目规划、图表、排期和验收材料
-```
+端口来源于根目录 `.env.ports`，应用配置启用 `strictPort`，端口冲突时直接报错。
 
-## 本地运行
+| 服务 | 地址 |
+|---|---|
+| 前端开发 | http://127.0.0.1:5211 |
+| API | http://127.0.0.1:8211/api |
+| Swagger | http://127.0.0.1:8211/api/docs |
+| 前端预览 | http://127.0.0.1:6211 |
 
-安装依赖：
+## 本地启动
 
 ```bash
 npm install
-```
-
-启动 API：
-
-```bash
 npm run dev:api
-```
-
-启动前端：
-
-```bash
 npm run dev:web
 ```
 
-访问：
-
-- 前端：http://localhost:5173
-- API：http://localhost:3000/api
-- Swagger：http://localhost:3000/api/docs
-
-演示账号：
-
-| 角色 | 账号 | 密码 |
-|---|---|---|
-| 管理员 | `admin` | `Admin@123` |
-| 学员 | `student` | `Student@123` |
-
-## Docker 部署
+构建与测试：
 
 ```bash
-docker compose up --build
+npm run test
+npm run build
+npm run typecheck
 ```
 
-访问：
+## 登录账号
 
-- Web：http://localhost
-- API：http://localhost:3000/api
-- MinIO 控制台：http://localhost:9001
+登录必须同时提交角色、账号和密码。角色不匹配时，即使账号密码正确也会拒绝登录。
 
-## 当前已实现 MVP
+| 角色 | 账号 | 密码 | 入口范围 |
+|---|---|---|---|
+| 平台管理员 | `admin` | `Admin@123` | 全校配置、审计、审核闭环 |
+| 任课教师 | `teacher` | `Teacher@123` | 课程管理、学习预警、干预审核 |
+| 题库管理员 | `question` | `Question@123` | 题库维护、试题审核 |
+| 学习督导员 | `supervisor` | `Supervisor@123` | 班级预警、处理跟踪 |
+| 学生 | `student` | `Student@123` | 本人学习、考试、画像反馈 |
 
-- 登录与 JWT 认证
-- 工作台概览
-- 课程列表
-- 题库列表
-- 考试计划列表
-- 在线答题与提交评分
-- 统计报表页
-- Prisma PostgreSQL 数据模型
-- Docker Compose：Web、API、PostgreSQL、Redis、MinIO
-- GitHub Actions CI
+## 功能入口
 
-## 交付物
+- `/dashboard`：角色化考核指挥台
+- `/profile`：学习画像、知识点薄弱诊断、错题/材料推荐、预警与审核闭环
+- `/courses`：学习任务与课程章节
+- `/records`：学习记录与进度监测
+- `/questions`：题库表单、审核与组卷，仅教师/题库/管理角色可见
+- `/exams`：在线考试计划与考试入口
+- `/marking`：阅卷工作台，仅教师/督导/管理角色可见
+- `/reports`：积分评价、个人/班级/院系统计、证书报告
+- `/acceptance`：验收清单、测试证据与里程碑
 
-- `deliverables/outputs/思想理论学习考核平台-项目蓝图与验收方案.docx`
-- `deliverables/outputs/思想理论学习考核平台-项目蓝图.md`
-- `deliverables/outputs/思想理论学习考核平台-项目排期任务测试验收表.xlsx`
-- `deliverables/outputs/Git-GitHub版本管理与协作方案.md`
-- `deliverables/diagrams/system-architecture.svg`
-- `deliverables/diagrams/business-flow.svg`
-- `deliverables/diagrams/data-flow.svg`
+## 差异化能力
 
-## 分支模型
+- 登录前隔离：未登录访问业务路由会跳转登录页。
+- 角色权限：前端路由和后端接口双层校验角色权限。
+- 学习画像：聚合作答结果、学习时长、任务完成度和风险等级。
+- 薄弱诊断：按知识点计算掌握度、错题数和趋势，优先暴露薄弱项。
+- 推荐闭环：根据薄弱知识点生成材料/练习推荐，并进入教师审核。
+- 预警闭环：教师、督导和管理员可查看学习预警并审核处理。
+- 数据结构：Prisma schema 已补角色、知识点、答题诊断、画像快照、推荐、预警和审核任务模型。
 
-- `main`：稳定主分支，只接收验收通过的发布版本。
-- `develop`：开发集成分支，功能分支合并入口。
-- `feature/<module>`：功能开发分支。
-- `fix/<issue>`：缺陷修复分支。
-- `release/<version>`：验收发布分支。
-- `hotfix/<issue>`：生产紧急修复分支。
+完整需求、架构、API、测试、部署与验收材料见 `docs/`。

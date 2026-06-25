@@ -1,6 +1,11 @@
-import { IsArray, IsNotEmpty, IsObject, IsOptional, IsString } from "class-validator";
+import { IsArray, IsIn, IsNotEmpty, IsObject, IsOptional, IsString } from "class-validator";
+import type { RoleCode } from "@assessment/shared";
 
 export class LoginDto {
+  @IsString()
+  @IsIn(["platform_admin", "org_admin", "course_admin", "question_admin", "supervisor", "learner", "auditor"])
+  role!: RoleCode;
+
   @IsString()
   @IsNotEmpty()
   username!: string;

@@ -48,9 +48,39 @@ model User {
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
   org    Org    @relation(fields: [orgId], references: [id])
+  roles  UserRole[]
+  answerDiagnostics AnswerDiagnostic[]
+  profileSnapshots  LearningProfileSnapshot[]
+  recommendations   LearningRecommendation[]
+  alerts            LearningAlert[]
 
   @@unique([tenantId, username])
   @@index([tenantId, orgId])
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+
+  users UserRole[]
+}
+
+model UserRole {
+  id        String   @id @default(uuid())
+  userId    String
+  roleId    String
+  scopeType String   @default("tenant")
+  scopeId   String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  role Role @relation(fields: [roleId], references: [id])
+
+  @@unique([userId, roleId, scopeType, scopeId])
+  @@index([roleId, scopeType, scopeId])
 }
 
 model Course {
@@ -88,9 +118,12 @@ model Question {
   stem       String
   options    Json
   answer     Json
+  knowledgePoints Json     @default("[]")
   score      Int      @default(10)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  answerDiagnostics AnswerDiagnostic[]
 
   @@index([bankName, type, difficulty])
 }
@@ -124,4 +157,105 @@ model ExamAttempt {
   examPlan ExamPlan @relation(fields: [examPlanId], references: [id])
 
   @@index([examPlanId, userId])
+}
+
+model KnowledgePoint {
+  id        String   @id @default(uuid())
+  courseId  String?
+  name      String
+  parentId  String?
+  weight    Int      @default(1)
+  createdAt DateTime @default(now())
+
+  diagnostics AnswerDiagnostic[]
+
+  @@unique([courseId, name])
+  @@index([courseId, parentId])
+}
+
+model AnswerDiagnostic {
+  id               String   @id @default(uuid())
+  learnerId        String
+  questionId       String
+  knowledgePointId String
+  score            Int
+  maximumScore     Int
+  durationSeconds  Int      @default(0)
+  answeredAt       DateTime @default(now())
+  isWrong          Boolean  @default(false)
+
+  learner        User           @relation(fields: [learnerId], references: [id])
+  question       Question       @relation(fields: [questionId], references: [id])
+  knowledgePoint KnowledgePoint @relation(fields: [knowledgePointId], references: [id])
+
+  @@index([learnerId, knowledgePointId, answeredAt])
+  @@index([questionId, isWrong])
+}
+
+model LearningProfileSnapshot {
+  id             String   @id @default(uuid())
+  learnerId      String
+  periodKey      String
+  overallMastery Int
+  studyMinutes   Int
+  completedTasks Int
+  pendingTasks   Int
+  riskLevel      String
+  diagnostics    Json
+  createdAt      DateTime @default(now())
+
+  learner User @relation(fields: [learnerId], references: [id])
+
+  @@unique([learnerId, periodKey])
+  @@index([riskLevel, createdAt])
+}
+
+model LearningRecommendation {
+  id             String   @id @default(uuid())
+  learnerId      String
+  type           String
+  title          String
+  knowledgePoint String
+  reason         String
+  priority       String
+  status         String   @default("pending_review")
+  reviewTaskId   String?
+  createdAt      DateTime @default(now())
+  resolvedAt     DateTime?
+
+  learner User @relation(fields: [learnerId], references: [id])
+
+  @@index([learnerId, status, priority])
+}
+
+model LearningAlert {
+  id          String   @id @default(uuid())
+  learnerId   String
+  level       String
+  title       String
+  reason      String
+  ownerRole   String
+  status      String   @default("open")
+  createdAt   DateTime @default(now())
+  resolvedAt  DateTime?
+
+  learner User @relation(fields: [learnerId], references: [id])
+
+  @@index([ownerRole, status, level])
+  @@index([learnerId, status])
+}
+
+model ReviewTask {
+  id          String   @id @default(uuid())
+  type        String
+  title       String
+  submittedBy String
+  targetRole  String
+  status      String   @default("pending")
+  comment     String?
+  createdAt   DateTime @default(now())
+  reviewedAt  DateTime?
+  reviewerId  String?
+
+  @@index([targetRole, status, createdAt])
 }

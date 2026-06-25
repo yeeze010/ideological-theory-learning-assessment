@@ -19,6 +19,12 @@ export interface UserProfile {
   orgName: string;
 }
 
+export interface LoginRequest {
+  role: RoleCode;
+  username: string;
+  password: string;
+}
+
 export interface DashboardOverview {
   learnerCount: number;
   courseCount: number;
@@ -93,4 +99,55 @@ export interface AuditLogItem {
   resourceName: string;
   createdAt: string;
   ip: string;
+}
+
+export interface KnowledgePointDiagnostic {
+  knowledgePoint: string;
+  mastery: number;
+  errorCount: number;
+  trend: "up" | "flat" | "down";
+  status: "mastered" | "developing" | "weak";
+}
+
+export interface LearningProfile {
+  learnerId: string;
+  learnerName: string;
+  role: RoleCode;
+  overallMastery: number;
+  studyMinutes: number;
+  completedTasks: number;
+  pendingTasks: number;
+  riskLevel: "low" | "medium" | "high";
+  diagnostics: KnowledgePointDiagnostic[];
+}
+
+export interface LearningRecommendation {
+  id: string;
+  title: string;
+  type: "material" | "practice" | "review" | "teacher_action";
+  knowledgePoint: string;
+  reason: string;
+  priority: "low" | "medium" | "high";
+}
+
+export interface LearningAlert {
+  id: string;
+  learnerId: string;
+  learnerName: string;
+  level: "notice" | "warning" | "critical";
+  title: string;
+  reason: string;
+  ownerRole: RoleCode;
+  status: "open" | "processing" | "resolved";
+}
+
+export interface ReviewTask {
+  id: string;
+  type: "question" | "recommendation" | "alert";
+  title: string;
+  submittedBy: string;
+  targetRole: RoleCode;
+  status: "pending" | "approved" | "rejected";
+  comment?: string;
+  createdAt: string;
 }
