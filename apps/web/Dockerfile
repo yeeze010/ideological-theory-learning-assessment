@@ -3,7 +3,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY apps/web/package.json apps/web/package.json
 COPY packages/shared/package.json packages/shared/package.json
-RUN npm install
+RUN npm install --include=optional && npm install --save-dev @rollup/rollup-linux-x64-musl
 
 FROM deps AS build
 COPY . .

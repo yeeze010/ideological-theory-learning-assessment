@@ -7,12 +7,14 @@ RUN npm install
 
 FROM deps AS build
 COPY . .
-RUN npm run build -w packages/shared && npm run build -w apps/api
+RUN rm -f packages/shared/tsconfig.tsbuildinfo && npm run build -w packages/shared && npm run build -w apps/api
 
 FROM node:24-alpine
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/packages/shared/dist ./packages/shared/dist
+COPY --from=build /app/packages/shared/package.json ./packages/shared/package.json
 COPY --from=build /app/apps/api/dist ./apps/api/dist
 COPY --from=build /app/apps/api/package.json ./apps/api/package.json
 EXPOSE 3000

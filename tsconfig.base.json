@@ -8,6 +8,9 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@assessment/shared": ["packages/shared/dist/index.d.ts"]
+    }
   }
 }
