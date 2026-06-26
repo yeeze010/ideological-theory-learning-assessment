@@ -65,6 +65,7 @@ function logout() {
 <template>
   <router-view v-if="$route.path === '/login'" />
   <div v-else class="product-shell">
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
     <aside class="sidebar">
       <div class="brand">
         <div class="brand-mark">政</div>
@@ -86,7 +87,7 @@ function logout() {
         <div><strong>系统运行正常</strong><small>API 8211 · Web 5211</small></div>
       </div>
     </aside>
-    <main class="main">
+    <main class="main" id="main-content">
       <header class="topbar">
         <div><span class="folio">思政学评 / {{ activeLabel }}</span></div>
         <div class="top-actions">

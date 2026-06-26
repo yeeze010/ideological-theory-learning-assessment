@@ -54,7 +54,7 @@ async function login() {
         </div>
       </div>
     </section>
-    <section class="login-form">
+    <form class="login-form" @submit.prevent="login">
       <span class="eyebrow">登录系统</span>
       <h2>进入思政学评</h2>
       <div class="field">
@@ -65,17 +65,17 @@ async function login() {
       </div>
       <div class="field" style="margin-top:14px">
         <label>账号</label>
-        <input v-model="username" autocomplete="username" />
+        <input v-model="username" autocomplete="username" required />
       </div>
       <div class="field" style="margin-top:14px">
         <label>密码</label>
-        <input v-model="password" type="password" autocomplete="current-password" @keyup.enter="login" />
+        <input v-model="password" type="password" autocomplete="current-password" required />
       </div>
-      <button class="button primary" style="margin-top:18px" :disabled="loading" @click="login">
+      <button class="button primary" style="margin-top:18px" :disabled="loading" type="submit">
         {{ loading ? "登录中..." : "登录" }}
       </button>
       <p v-if="error" class="danger" style="font-size:12px">{{ error }}</p>
       <p style="color:var(--muted);font-size:11px">当前角色范围：{{ selectedAccount.scope }}</p>
-    </section>
+    </form>
   </main>
 </template>
