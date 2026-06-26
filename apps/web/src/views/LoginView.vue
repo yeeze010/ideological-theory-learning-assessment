@@ -5,11 +5,10 @@ import type { RoleCode } from "@assessment/shared";
 import { useSessionStore } from "@/stores/session";
 
 const accounts: Array<{ role: RoleCode; label: string; username: string; password: string; scope: string }> = [
-  { role: "platform_admin", label: "平台管理员", username: "admin", password: "Admin@123", scope: "全校配置、审计和审核闭环" },
-  { role: "course_admin", label: "任课教师", username: "teacher", password: "Teacher@123", scope: "课程、学习预警和干预审核" },
-  { role: "question_admin", label: "题库管理员", username: "question", password: "Question@123", scope: "题库维护和试题审核" },
-  { role: "supervisor", label: "学习督导员", username: "supervisor", password: "Supervisor@123", scope: "班级学习预警和处理跟踪" },
-  { role: "learner", label: "学生", username: "student", password: "Student@123", scope: "本人学习、考试和画像反馈" }
+  { role: "learner", label: "学生", username: "student", password: "Student@123", scope: "本人课程、考试、学习画像与报告" },
+  { role: "course_admin", label: "教师", username: "teacher", password: "Teacher@123", scope: "课程建设、题库组卷、阅卷和学情干预" },
+  { role: "platform_admin", label: "管理员", username: "admin", password: "Admin@123", scope: "全校配置、权限、审核、统计和审计" },
+  { role: "supervisor", label: "督导/教研员", username: "supervisor", password: "Supervisor@123", scope: "教学质量巡查、班级预警和评价分析" }
 ];
 
 const selectedRole = ref<RoleCode>("learner");
@@ -46,7 +45,7 @@ async function login() {
     <section class="login-hero">
       <span class="eyebrow">思想理论学习 · 考核评价 · 成长反馈</span>
       <h1>让每一次理论学习，都形成可见的进步。</h1>
-      <p>登录会同时校验角色、账号和密码。学生只能访问本人学习与考试，教师和管理角色进入题库、预警、审核和统计闭环。</p>
+      <p>登录会同时校验角色、账号和密码。学生进入学习与考试，教师负责课程、题库和阅卷，管理员处理配置与审计，督导或教研员关注质量巡查与改进建议。</p>
       <div class="flow-track" style="margin-top:48px">
         <div v-for="(x, i) in ['角色隔离', '画像诊断', '材料推荐', '审核闭环']" :key="x" class="flow-step">
           <b>0{{ i + 1 }}</b>

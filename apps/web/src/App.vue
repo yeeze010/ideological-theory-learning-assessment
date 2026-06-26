@@ -16,31 +16,28 @@ const router = useRouter();
 const session = useSessionStore();
 
 const groups: Array<{ label: string; items: NavItem[] }> = [
-  { label: "总览", items: [{ path: "/dashboard", label: "考核指挥台", code: "01" }] },
+  { label: "总览", items: [{ path: "/dashboard", label: "学评总览", code: "01" }] },
   {
-    label: "学习端",
+    label: "学生端",
     items: [
-      { path: "/profile", label: "学习画像诊断", code: "02" },
+      { path: "/profile", label: "个人画像", code: "02", roles: ["learner"] },
       { path: "/courses", label: "学习任务与课程", code: "03" },
       { path: "/records", label: "学习记录", code: "04" }
     ]
   },
   {
-    label: "考试端",
+    label: "教师端",
     items: [
-      { path: "/questions", label: "题库与组卷", code: "05", roles: ["platform_admin", "org_admin", "course_admin", "question_admin"] },
-      { path: "/exams", label: "在线考试", code: "06" }
+      { path: "/questions", label: "题库与组卷", code: "05", roles: ["platform_admin", "course_admin"] },
+      { path: "/exams", label: "考试安排", code: "06" },
+      { path: "/marking", label: "阅卷与复核", code: "07", roles: ["platform_admin", "course_admin", "supervisor"] }
     ]
   },
   {
-    label: "阅卷端",
-    items: [{ path: "/marking", label: "阅卷工作台", code: "07", roles: ["platform_admin", "org_admin", "course_admin", "supervisor"] }]
-  },
-  {
-    label: "管理分析端",
+    label: "管理与督导",
     items: [
-      { path: "/reports", label: "评价与统计", code: "08", roles: ["platform_admin", "org_admin", "course_admin", "supervisor", "auditor"] },
-      { path: "/acceptance", label: "验收中心", code: "09", roles: ["platform_admin", "org_admin", "auditor"] }
+      { path: "/reports", label: "评价与统计", code: "08", roles: ["platform_admin", "course_admin", "supervisor"] },
+      { path: "/acceptance", label: "治理验收", code: "09", roles: ["platform_admin"] }
     ]
   }
 ];

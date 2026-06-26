@@ -24,12 +24,12 @@ export const router = createRouter({
     { path: "/profile", component: LearningProfileView },
     { path: "/courses", component: CoursesView },
     { path: "/records", component: WorkflowView, props: { mode: "records" } },
-    { path: "/questions", component: QuestionsView, meta: { roles: ["platform_admin", "org_admin", "course_admin", "question_admin"] } },
+    { path: "/questions", component: QuestionsView, meta: { roles: ["platform_admin", "course_admin"] } },
     { path: "/exams", component: ExamsView },
     { path: "/exams/:id/attempt", component: ExamAttemptView, meta: { roles: ["learner"] } },
-    { path: "/marking", component: WorkflowView, props: { mode: "marking" }, meta: { roles: ["platform_admin", "org_admin", "course_admin", "supervisor"] } },
-    { path: "/reports", component: ReportsView, meta: { roles: ["platform_admin", "org_admin", "course_admin", "supervisor", "auditor"] } },
-    { path: "/acceptance", component: AcceptanceView, meta: { roles: ["platform_admin", "org_admin", "auditor"] } }
+    { path: "/marking", component: WorkflowView, props: { mode: "marking" }, meta: { roles: ["platform_admin", "course_admin", "supervisor"] } },
+    { path: "/reports", component: ReportsView, meta: { roles: ["platform_admin", "course_admin", "supervisor"] } },
+    { path: "/acceptance", component: AcceptanceView, meta: { roles: ["platform_admin"] } }
   ]
 });
 
