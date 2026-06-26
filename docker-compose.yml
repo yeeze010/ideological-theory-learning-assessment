@@ -50,13 +50,13 @@ services:
       minio:
         condition: service_started
     environment:
-      PORT: 3000
+      PORT: 8211
       JWT_SECRET: change-me-in-production
       DATABASE_URL: postgresql://assessment:assessment@postgres:5432/assessment
       REDIS_URL: redis://redis:6379
-      CORS_ORIGIN: http://localhost
+      CORS_ORIGIN: http://localhost:5211,http://127.0.0.1:5211,http://localhost:6211
     ports:
-      - "3000:3000"
+      - "8211:8211"
 
   web:
     build:
@@ -66,7 +66,7 @@ services:
     depends_on:
       - api
     ports:
-      - "80:80"
+      - "5211:80"
 
 volumes:
   postgres-data:

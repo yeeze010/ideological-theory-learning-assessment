@@ -1,0 +1,27 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="780" viewBox="0 0 1280 780">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1220"/><stop offset="1" stop-color="#171923"/></linearGradient>
+    <style>
+      text{font-family:Arial,'Microsoft YaHei',sans-serif;fill:#e5e7eb} .title{font-size:30px;font-weight:700}.sub{font-size:15px;fill:#94a3b8}.box{fill:#111827;stroke:#38bdf8;stroke-width:2;rx:14}.box2{fill:#1f2937;stroke:#f87171;stroke-width:2;rx:14}.label{font-size:18px;font-weight:700}.small{font-size:13px;fill:#cbd5e1}.line{stroke:#64748b;stroke-width:2;marker-end:url(#arrow)}
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#64748b"/></marker>
+  </defs>
+  <rect width="1280" height="780" fill="url(#bg)"/>
+  <text x="60" y="58" class="title">思政理论学习考核评价系统 - 系统架构图</text>
+  <text x="60" y="86" class="sub">Vue 3 + TypeScript / NestJS / PostgreSQL / Redis / MinIO / Docker + Nginx</text>
+  <rect x="70" y="140" width="220" height="110" class="box2"/><text x="100" y="178" class="label">学生端</text><text x="100" y="208" class="small">学习任务、课程章节</text><text x="100" y="230" class="small">在线考试、证书报告</text>
+  <rect x="70" y="300" width="220" height="110" class="box2"/><text x="100" y="338" class="label">教师端</text><text x="100" y="368" class="small">题库、组卷、阅卷</text><text x="100" y="390" class="small">成绩与班级统计</text>
+  <rect x="70" y="460" width="220" height="110" class="box2"/><text x="100" y="498" class="label">管理后台</text><text x="100" y="528" class="small">组织权限、报表看板</text><text x="100" y="550" class="small">告警、附件、审计</text>
+  <rect x="390" y="235" width="220" height="190" class="box"/><text x="435" y="275" class="label">Nginx 接入层</text><text x="430" y="310" class="small">HTTPS / 静态资源</text><text x="430" y="335" class="small">反向代理 / 上传限制</text><text x="430" y="360" class="small">缓存 / 安全头</text>
+  <rect x="710" y="110" width="230" height="120" class="box"/><text x="750" y="150" class="label">前端应用 apps/web</text><text x="745" y="180" class="small">路由、表单、报表、考试交互</text><text x="745" y="205" class="small">Pinia / 组件库 / 响应式</text>
+  <rect x="710" y="285" width="230" height="150" class="box"/><text x="750" y="325" class="label">API 服务 apps/api</text><text x="745" y="355" class="small">鉴权、RBAC、DTO 校验</text><text x="745" y="380" class="small">学习、考试、阅卷、积分</text><text x="745" y="405" class="small">证书、报表、审计</text>
+  <rect x="710" y="500" width="230" height="110" class="box"/><text x="748" y="540" class="label">共享包 packages/shared</text><text x="745" y="570" class="small">枚举、权限码、类型、校验规则</text>
+  <rect x="1030" y="120" width="180" height="90" class="box2"/><text x="1072" y="158" class="label">PostgreSQL</text><text x="1064" y="185" class="small">业务数据 / 快照</text>
+  <rect x="1030" y="270" width="180" height="90" class="box2"/><text x="1090" y="308" class="label">Redis</text><text x="1060" y="335" class="small">缓存 / 队列 / 状态</text>
+  <rect x="1030" y="420" width="180" height="90" class="box2"/><text x="1090" y="458" class="label">MinIO</text><text x="1055" y="485" class="small">附件 / 证书 / 报告</text>
+  <rect x="1030" y="570" width="180" height="90" class="box2"/><text x="1084" y="608" class="label">监控审计</text><text x="1058" y="635" class="small">日志 / 告警 / 备份</text>
+  <line x1="290" y1="195" x2="390" y2="300" class="line"/><line x1="290" y1="355" x2="390" y2="330" class="line"/><line x1="290" y1="515" x2="390" y2="365" class="line"/>
+  <line x1="610" y1="300" x2="710" y2="170" class="line"/><line x1="610" y1="350" x2="710" y2="360" class="line"/>
+  <line x1="825" y1="230" x2="825" y2="285" class="line"/><line x1="825" y1="435" x2="825" y2="500" class="line"/>
+  <line x1="940" y1="350" x2="1030" y2="165" class="line"/><line x1="940" y1="360" x2="1030" y2="315" class="line"/><line x1="940" y1="375" x2="1030" y2="465" class="line"/><line x1="940" y1="395" x2="1030" y2="615" class="line"/>
+</svg>

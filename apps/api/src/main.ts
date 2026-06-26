@@ -7,7 +7,7 @@ import { AppModule } from "./modules/app.module";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: process.env.CORS_ORIGIN?.split(",") ?? ["http://localhost:5173"],
+    origin: process.env.CORS_ORIGIN?.split(",") ?? ["http://localhost:5211", "http://127.0.0.1:5211", "http://localhost:6211", "http://127.0.0.1:6211"],
     credentials: true
   });
   app.setGlobalPrefix("api");
@@ -26,7 +26,7 @@ async function bootstrap() {
     .build();
   SwaggerModule.setup("api/docs", app, SwaggerModule.createDocument(app, swaggerConfig));
 
-  const port = Number(process.env.PORT ?? 3000);
+  const port = Number(process.env.PORT ?? process.env.SERVER_PORT ?? 8211);
   await app.listen(port);
 }
 

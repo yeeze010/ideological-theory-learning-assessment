@@ -1,53 +1,6 @@
-<script setup lang="ts">
-import type { DashboardOverview } from "@assessment/shared";
-import { onMounted, ref } from "vue";
-import { api } from "@/api/client";
-
-const overview = ref<DashboardOverview>();
-
-onMounted(async () => {
-  overview.value = await api.overview();
-});
-</script>
-
 <template>
-  <section class="page-title">
-    <div>
-      <h1>工作台</h1>
-      <p>学习、考试、证书和风险预警的统一入口。</p>
-    </div>
-    <el-tag type="danger">今日待处理 {{ overview?.riskAlerts ?? 0 }} 项</el-tag>
-  </section>
-
-  <section class="metric-grid">
-    <div class="metric">
-      <label>学员数</label>
-      <strong>{{ overview?.learnerCount ?? "-" }}</strong>
-    </div>
-    <div class="metric">
-      <label>课程数</label>
-      <strong>{{ overview?.courseCount ?? "-" }}</strong>
-    </div>
-    <div class="metric">
-      <label>学习完成率</label>
-      <strong>{{ overview?.completionRate ?? "-" }}%</strong>
-    </div>
-    <div class="metric">
-      <label>考试通过率</label>
-      <strong>{{ overview?.passRate ?? "-" }}%</strong>
-    </div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-header">
-      <h2>验收闭环</h2>
-      <span>课程发布 -> 学习进度 -> 在线考试 -> 成绩发布 -> 证书归档</span>
-    </div>
-    <el-steps :active="3" finish-status="success" simple>
-      <el-step title="课程发布" />
-      <el-step title="学习中" />
-      <el-step title="考试中" />
-      <el-step title="成绩归档" />
-    </el-steps>
-  </section>
+  <div class="page-head"><div><span class="eyebrow">总览 / 2026 春季学期</span><h1>考核指挥台</h1><p>从学习参与到评价结果，观察全校思政理论学习质量。</p></div><button class="button primary">发布学习任务</button></div>
+  <div class="flow-track"><div v-for="(s,i) in ['任务发布','章节学习','过程记录','在线考试','阅卷复核','积分与报告']" :key="s" class="flow-step"><b>0{{i+1}}</b><strong>{{s}}</strong><span>{{[12,86,3248,3,28,1240][i]}} {{i===0?'项':i===1?'%完成':i===2?'条':i===3?'场':i===4?'份待处理':'份已生成'}}</span></div></div>
+  <div class="metric-grid" style="margin-top:18px"><div class="metric"><label>学习任务完成率</label><strong>86.4%</strong><small>较上周 +4.2%</small></div><div class="metric"><label>考试综合通过率</label><strong>91.2%</strong><small>目标线 90%</small></div><div class="metric"><label>待人工阅卷</label><strong>28</strong><small class="danger">2 个批次临近截止</small></div><div class="metric"><label>学习积分发放</label><strong>12,480</strong><small>本学期累计</small></div></div>
+  <div class="grid-2"><section class="panel"><div class="panel-head"><h2>院系学习完成率</h2><span>目标线 85%</span></div><div class="panel-body chart-bars"><div v-for="(x,i) in [93,88,85,79,76,71]" :key="i"><b>{{x}}%</b><i :style="{height:x+'%'}"></i><span>{{['马院','法学院','经管院','文学院','理学院','工学院'][i]}}</span></div></div></section><section class="panel"><div class="panel-head"><h2>今日重点事项</h2><span>按风险优先级排序</span></div><div class="panel-body timeline"><div class="timeline-row"><time>09:00</time><i class="timeline-dot"></i><div><strong>党史学习任务即将截止</strong><span>24 名学生未完成，已发送提醒</span></div></div><div class="timeline-row"><time>14:00</time><i class="timeline-dot"></i><div><strong>期末考试开始</strong><span>预计 520 人同时在线</span></div></div><div class="timeline-row"><time>18:00</time><i class="timeline-dot"></i><div><strong>主观题阅卷截止</strong><span>当前完成率 74%</span></div></div></div></section></div>
 </template>

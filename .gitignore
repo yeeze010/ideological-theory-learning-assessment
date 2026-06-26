@@ -33,3 +33,7 @@ deliverables/qa/
 # Office temporary files
 ~$*.docx
 ~$*.xlsx
+.vite/
+.env.local
+target/
+.vscode/.history/
