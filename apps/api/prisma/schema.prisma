@@ -15,9 +15,10 @@ model Tenant {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  orgs    Org[]
-  users   User[]
-  courses Course[]
+  orgs      Org[]
+  users     User[]
+  courses   Course[]
+  questions Question[]
 }
 
 model Org {
@@ -29,33 +30,41 @@ model Org {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  tenant Tenant @relation(fields: [tenantId], references: [id])
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   users  User[]
 
   @@index([tenantId, parentId])
 }
 
 model User {
-  id           String   @id @default(uuid())
-  tenantId     String
-  orgId        String
-  username     String
-  passwordHash String
-  name         String
-  status       String   @default("enabled")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                String    @id @default(uuid())
+  tenantId          String
+  orgId             String
+  username          String
+  passwordHash      String
+  name              String
+  status            String    @default("enabled")
+  tokenVersion      Int       @default(0)
+  failedLoginCount  Int       @default(0)
+  lockedUntil       DateTime?
+  passwordChangedAt DateTime  @default(now())
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-  tenant Tenant @relation(fields: [tenantId], references: [id])
-  org    Org    @relation(fields: [orgId], references: [id])
-  roles  UserRole[]
+  tenant            Tenant                    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  org               Org                       @relation(fields: [orgId], references: [id], onDelete: Restrict)
+  roles             UserRole[]
+  examAttempts      ExamAttempt[]
+  enrollments       CourseEnrollment[]
+  learningEvents    LearningEvent[]
   answerDiagnostics AnswerDiagnostic[]
   profileSnapshots  LearningProfileSnapshot[]
   recommendations   LearningRecommendation[]
   alerts            LearningAlert[]
+  auditLogs         AuditLog[]
 
   @@unique([tenantId, username])
-  @@index([tenantId, orgId])
+  @@index([tenantId, orgId, status])
 }
 
 model Role {
@@ -76,8 +85,8 @@ model UserRole {
   scopeId   String?
   createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id])
-  role Role @relation(fields: [roleId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@unique([userId, roleId, scopeType, scopeId])
   @@index([roleId, scopeType, scopeId])
@@ -93,39 +102,92 @@ model Course {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  tenant   Tenant          @relation(fields: [tenantId], references: [id])
-  chapters CourseChapter[]
-  exams    ExamPlan[]
+  tenant          Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  chapters        CourseChapter[]
+  exams           ExamPlan[]
+  enrollments     CourseEnrollment[]
+  knowledgePoints KnowledgePoint[]
+  learningEvents  LearningEvent[]
 
   @@index([tenantId, status])
 }
 
 model CourseChapter {
-  id              String   @id @default(uuid())
+  id              String @id @default(uuid())
   courseId        String
   title           String
-  sort            Int      @default(0)
-  requiredMinutes Int      @default(20)
+  sort            Int    @default(0)
+  requiredMinutes Int    @default(20)
 
-  course Course @relation(fields: [courseId], references: [id])
+  course         Course          @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  learningEvents LearningEvent[]
+
+  @@unique([courseId, sort])
+}
+
+model CourseEnrollment {
+  id             String    @id @default(uuid())
+  courseId       String
+  userId         String
+  status         String    @default("learning")
+  completionRate Int       @default(0)
+  studyMinutes   Int       @default(0)
+  completedTasks Int       @default(0)
+  pendingTasks   Int       @default(0)
+  enrolledAt     DateTime  @default(now())
+  completedAt    DateTime?
+  updatedAt      DateTime  @updatedAt
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, userId])
+  @@index([userId, status])
+}
+
+model LearningEvent {
+  id              String   @id @default(uuid())
+  userId          String
+  courseId        String?
+  chapterId       String?
+  eventType       String
+  progress        Int?
+  score           Int?
+  durationMinutes Int      @default(0)
+  metadata        Json     @default("{}")
+  occurredAt      DateTime @default(now())
+
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course  Course?        @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  chapter CourseChapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+
+  @@index([userId, occurredAt])
+  @@index([courseId, eventType, occurredAt])
 }
 
 model Question {
-  id         String   @id @default(uuid())
-  bankName   String
-  type       String
-  difficulty String
-  stem       String
-  options    Json
-  answer     Json
+  id              String   @id @default(uuid())
+  tenantId        String
+  bankName        String
+  type            String
+  difficulty      String
+  stem            String
+  options         Json
+  answer          Json
   knowledgePoints Json     @default("[]")
-  score      Int      @default(10)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  score           Int      @default(10)
+  status          String   @default("pending_review")
+  createdById     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
+  tenant            Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  examLinks         ExamPlanQuestion[]
   answerDiagnostics AnswerDiagnostic[]
+  reviewTasks       ReviewTask[]
 
-  @@index([bankName, type, difficulty])
+  @@index([tenantId, bankName, status])
+  @@index([type, difficulty])
 }
 
 model ExamPlan {
@@ -140,23 +202,45 @@ model ExamPlan {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  course   Course        @relation(fields: [courseId], references: [id])
-  attempts ExamAttempt[]
+  course    Course             @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  questions ExamPlanQuestion[]
+  attempts  ExamAttempt[]
+
+  @@index([courseId, status, startAt])
+}
+
+model ExamPlanQuestion {
+  id         String @id @default(uuid())
+  examPlanId String
+  questionId String
+  sort       Int
+  score      Int
+
+  examPlan ExamPlan @relation(fields: [examPlanId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Restrict)
+
+  @@unique([examPlanId, questionId])
+  @@unique([examPlanId, sort])
 }
 
 model ExamAttempt {
   id          String    @id @default(uuid())
   examPlanId  String
   userId      String
-  answers     Json
+  answers     Json      @default("{}")
+  details     Json      @default("[]")
   totalScore  Int       @default(0)
   passed      Boolean   @default(false)
+  status      String    @default("in_progress")
   startedAt   DateTime  @default(now())
   submittedAt DateTime?
 
-  examPlan ExamPlan @relation(fields: [examPlanId], references: [id])
+  examPlan    ExamPlan           @relation(fields: [examPlanId], references: [id], onDelete: Cascade)
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  diagnostics AnswerDiagnostic[]
 
-  @@index([examPlanId, userId])
+  @@index([examPlanId, userId, status])
+  @@index([userId, submittedAt])
 }
 
 model KnowledgePoint {
@@ -167,6 +251,7 @@ model KnowledgePoint {
   weight    Int      @default(1)
   createdAt DateTime @default(now())
 
+  course      Course?            @relation(fields: [courseId], references: [id], onDelete: Cascade)
   diagnostics AnswerDiagnostic[]
 
   @@unique([courseId, name])
@@ -175,6 +260,7 @@ model KnowledgePoint {
 
 model AnswerDiagnostic {
   id               String   @id @default(uuid())
+  attemptId        String
   learnerId        String
   questionId       String
   knowledgePointId String
@@ -184,10 +270,12 @@ model AnswerDiagnostic {
   answeredAt       DateTime @default(now())
   isWrong          Boolean  @default(false)
 
-  learner        User           @relation(fields: [learnerId], references: [id])
-  question       Question       @relation(fields: [questionId], references: [id])
-  knowledgePoint KnowledgePoint @relation(fields: [knowledgePointId], references: [id])
+  attempt        ExamAttempt    @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  learner        User           @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  question       Question       @relation(fields: [questionId], references: [id], onDelete: Restrict)
+  knowledgePoint KnowledgePoint @relation(fields: [knowledgePointId], references: [id], onDelete: Restrict)
 
+  @@unique([attemptId, questionId, knowledgePointId])
   @@index([learnerId, knowledgePointId, answeredAt])
   @@index([questionId, isWrong])
 }
@@ -204,58 +292,84 @@ model LearningProfileSnapshot {
   diagnostics    Json
   createdAt      DateTime @default(now())
 
-  learner User @relation(fields: [learnerId], references: [id])
+  learner User @relation(fields: [learnerId], references: [id], onDelete: Cascade)
 
   @@unique([learnerId, periodKey])
   @@index([riskLevel, createdAt])
 }
 
 model LearningRecommendation {
-  id             String   @id @default(uuid())
-  learnerId      String
-  type           String
-  title          String
-  knowledgePoint String
-  reason         String
-  priority       String
-  status         String   @default("pending_review")
-  reviewTaskId   String?
-  createdAt      DateTime @default(now())
-  resolvedAt     DateTime?
+  id              String    @id @default(uuid())
+  learnerId       String
+  sourceAttemptId String?
+  type            String
+  title           String
+  knowledgePoint  String
+  reason          String
+  priority        String
+  status          String    @default("pending_review")
+  reviewTaskId    String?
+  createdAt       DateTime  @default(now())
+  resolvedAt      DateTime?
 
-  learner User @relation(fields: [learnerId], references: [id])
+  learner User @relation(fields: [learnerId], references: [id], onDelete: Cascade)
 
   @@index([learnerId, status, priority])
+  @@index([sourceAttemptId])
 }
 
 model LearningAlert {
-  id          String   @id @default(uuid())
-  learnerId   String
-  level       String
-  title       String
-  reason      String
-  ownerRole   String
-  status      String   @default("open")
-  createdAt   DateTime @default(now())
-  resolvedAt  DateTime?
+  id              String    @id @default(uuid())
+  learnerId       String
+  sourceAttemptId String?
+  level           String
+  title           String
+  reason          String
+  ownerRole       String
+  status          String    @default("open")
+  createdAt       DateTime  @default(now())
+  resolvedAt      DateTime?
 
-  learner User @relation(fields: [learnerId], references: [id])
+  learner User @relation(fields: [learnerId], references: [id], onDelete: Cascade)
 
   @@index([ownerRole, status, level])
   @@index([learnerId, status])
+  @@index([sourceAttemptId])
 }
 
 model ReviewTask {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
+  questionId  String?
   type        String
   title       String
   submittedBy String
   targetRole  String
-  status      String   @default("pending")
+  status      String    @default("pending")
   comment     String?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
   reviewedAt  DateTime?
   reviewerId  String?
 
+  question Question? @relation(fields: [questionId], references: [id], onDelete: SetNull)
+
   @@index([targetRole, status, createdAt])
+  @@index([questionId])
+}
+
+model AuditLog {
+  id           String   @id @default(uuid())
+  tenantId     String
+  actorId      String?
+  actorName    String
+  action       String
+  resourceType String
+  resourceName String
+  ip           String   @default("127.0.0.1")
+  metadata     Json     @default("{}")
+  createdAt    DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, createdAt])
+  @@index([actorId, action])
 }

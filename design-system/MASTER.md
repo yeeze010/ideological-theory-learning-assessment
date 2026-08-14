@@ -1,6 +1,6 @@
 # Design System Master
 
-Source of truth for 思政学评. This file mirrors the root `DESIGN.md` and adds the GitHub `ui-ux-pro-max-skill` audit floor.
+Source of truth for 思政理论学习考核评价系统. This file mirrors the root `DESIGN.md` and adds the GitHub `ui-ux-pro-max-skill` audit floor.
 
 ## Product Direction
 

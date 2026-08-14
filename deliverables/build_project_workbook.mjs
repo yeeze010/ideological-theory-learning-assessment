@@ -66,7 +66,7 @@ function setWidths(sheet, widths) {
 }
 
 const overview = addSheet("项目总览");
-title(overview, "思想理论学习考核平台 - 项目管理总览", "版本 V1.0 | 适用于立项、开发、测试、部署与验收跟踪");
+title(overview, "思政理论学习考核评价系统 - 项目管理总览", "版本 V1.0 | 适用于立项、开发、测试、部署与验收跟踪");
 overview.getRange("A4:C9").values = [
   ["项目周期", "12 周", "从需求冻结到上线验收"],
   ["推荐栈", "Vue 3 + NestJS", "同语言栈，适合后台管理与考试业务"],
@@ -184,6 +184,6 @@ const errors = await wb.inspect({
 console.log(errors.ndjson);
 
 const output = await SpreadsheetFile.exportXlsx(wb);
-const outPath = path.join(outputDir, "思想理论学习考核平台-项目排期任务测试验收表.xlsx");
+const outPath = path.join(outputDir, "思政理论学习考核评价系统-项目排期任务测试验收表.xlsx");
 await output.save(outPath);
 console.log(outPath);

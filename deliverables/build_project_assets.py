@@ -14,7 +14,7 @@ DIAGRAM_DIR.mkdir(parents=True, exist_ok=True)
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-PROJECT_NAME = "思想理论学习考核平台"
+PROJECT_NAME = "思政理论学习考核评价系统"
 
 
 sections = [
@@ -261,7 +261,7 @@ def build_markdown():
         for row in rows[1:]:
             lines.append("| " + " | ".join(row) + " |")
         lines.append("")
-    md_path = OUT_DIR / "思想理论学习考核平台-项目蓝图.md"
+    md_path = OUT_DIR / "思政理论学习考核评价系统-项目蓝图.md"
     md_path.write_text("\n".join(lines), encoding="utf-8")
     return md_path
 
@@ -329,7 +329,7 @@ def build_docx():
     ]:
         doc.add_paragraph(item, style=None)
 
-    out_path = OUT_DIR / "思想理论学习考核平台-项目蓝图与验收方案.docx"
+    out_path = OUT_DIR / "思政理论学习考核评价系统-项目蓝图与验收方案.docx"
     doc.save(out_path)
     return out_path
 
@@ -405,7 +405,7 @@ def build_architecture_svg():
 {SVG_STYLE}{svg_defs()}
 <rect width="1180" height="720" fill="#0f172a"/>
 <rect width="1180" height="720" fill="url(#grid)"/>
-<text x="32" y="38" class="title">系统架构图 - 思想理论学习考核平台</text>
+<text x="32" y="38" class="title">系统架构图 - 思政理论学习考核评价系统</text>
 <text x="32" y="56" class="sub">Vue 3 + NestJS + PostgreSQL + Redis + MinIO + Docker + Nginx</text>
 <rect x="28" y="78" width="1124" height="574" rx="12" class="region"/>
 <text x="42" y="97" fill="#fbbf24" font-size="10" font-weight="600">Docker / Nginx / Private Network</text>

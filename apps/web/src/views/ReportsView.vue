@@ -1,6 +1,65 @@
+<script setup lang="ts">
+import { onMounted, ref } from "vue";
+import type { AuditLogItem, DashboardOverview } from "@assessment/shared";
+import { api } from "@/api/client";
+
+const overview = ref<DashboardOverview | null>(null);
+const logs = ref<AuditLogItem[]>([]);
+const loading = ref(true);
+const error = ref("");
+
+async function load() {
+  loading.value = true;
+  error.value = "";
+  try {
+    [overview.value, logs.value] = await Promise.all([api.overview(), api.auditLogs()]);
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : "统计数据读取失败";
+  } finally {
+    loading.value = false;
+  }
+}
+
+onMounted(load);
+</script>
+
 <template>
-  <div class="page-head"><div><span class="eyebrow">管理分析端 / 评价结果</span><h1>评价与统计</h1><p>从个人、班级到院系，统一查看学习投入、考试结果与综合积分。</p></div><button class="button">导出学习报告</button></div>
-  <div class="metric-grid"><div class="metric"><label>个人平均积分</label><strong>864</strong><small>较上学期 +8.4%</small></div><div class="metric"><label>班级达标率</label><strong>89%</strong><small>36 个班级已达标</small></div><div class="metric"><label>院系覆盖率</label><strong>100%</strong><small>12 个院系全部参与</small></div><div class="metric"><label>证书生成数</label><strong>1,240</strong><small>待生成 86 份</small></div></div>
-  <div class="grid-2"><section class="panel"><div class="panel-head"><h2>个人 / 班级 / 院系对比</h2><span>综合评价得分</span></div><div class="panel-body chart-bars"><div v-for="(x,i) in [92,86,83,78,75]" :key="i"><b>{{x}}</b><i :style="{height:x+'%'}"></i><span>{{['个人优秀','班级均值','院系均值','课程均值','校级基线'][i]}}</span></div></div></section><section class="panel"><div class="panel-head"><h2>评价构成</h2><span>总分 100</span></div><div class="panel-body"><div v-for="x in [{n:'课程学习',v:35},{n:'在线考试',v:30},{n:'实践任务',v:20},{n:'互动与积分',v:15}]" :key="x.n" style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:7px"><strong>{{x.n}}</strong><span>{{x.v}}%</span></div><div class="progress"><i :style="{width:x.v*2.5+'%'}"></i></div></div></div></section></div>
-  <section class="panel"><div class="panel-head"><h2>班级与院系排行</h2><span>指标口径：完成率 40% + 考试 40% + 积分 20%</span></div><table class="data-table"><thead><tr><th>排名</th><th>组织</th><th>学习完成率</th><th>考试通过率</th><th>平均积分</th><th>评价</th></tr></thead><tbody><tr v-for="(x,i) in [{n:'马克思主义学院 2025 级一班',a:96,b:94,c:912},{n:'法学院 2025 级二班',a:91,b:92,c:875},{n:'经济管理学院 2025 级一班',a:88,b:89,c:842}]" :key="x.n"><td>0{{i+1}}</td><td><strong>{{x.n}}</strong></td><td>{{x.a}}%</td><td>{{x.b}}%</td><td>{{x.c}}</td><td><span class="badge green">{{i===0?'优秀':'达标'}}</span></td></tr></tbody></table></section>
+  <div class="page-head">
+    <div>
+      <span class="eyebrow">管理分析 / 评价统计</span>
+      <h1>评价与统计</h1>
+      <p>展示当前账号数据范围内的学习完成、考试通过、审核和风险指标。</p>
+    </div>
+    <button class="button" type="button" :disabled="loading" @click="load">{{ loading ? "正在刷新..." : "刷新统计" }}</button>
+  </div>
+
+  <div v-if="loading" class="state-panel" aria-busy="true">正在汇总评价数据...</div>
+  <div v-else-if="error" class="state-panel error-state" role="alert">
+    <strong>统计数据未能载入</strong><span>{{ error }}</span>
+    <button class="button" type="button" @click="load">重新读取</button>
+  </div>
+  <template v-else-if="overview">
+    <div class="metric-grid">
+      <div class="metric"><label>课程数量</label><strong>{{ overview.courseCount }}</strong><small>当前可访问课程</small></div>
+      <div class="metric"><label>考试通过率</label><strong>{{ overview.passRate }}%</strong><small>已提交成绩口径</small></div>
+      <div class="metric"><label>学习完成率</label><strong>{{ overview.completionRate }}%</strong><small>当前数据范围</small></div>
+      <div class="metric"><label>待处理事项</label><strong>{{ overview.pendingReviews + overview.riskAlerts }}</strong><small>审核与预警合计</small></div>
+    </div>
+    <section class="panel data-panel">
+      <div class="panel-head"><h2>近期评价操作</h2><span>{{ logs.length }} 条审计记录</span></div>
+      <div v-if="!logs.length" class="empty-state"><strong>还没有操作记录</strong><span>登录、课程、考试和审核操作会记录在这里。</span></div>
+      <table v-else class="data-table">
+        <thead><tr><th>时间</th><th>操作人</th><th>操作</th><th>业务对象</th><th>来源地址</th></tr></thead>
+        <tbody>
+          <tr v-for="log in logs" :key="log.id">
+            <td>{{ new Date(log.createdAt).toLocaleString("zh-CN") }}</td>
+            <td><strong>{{ log.actorName }}</strong></td>
+            <td>{{ log.action }}</td>
+            <td>{{ log.resourceType }} / {{ log.resourceName }}</td>
+            <td>{{ log.ip }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </template>
 </template>

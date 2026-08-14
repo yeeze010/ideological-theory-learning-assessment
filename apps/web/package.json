@@ -7,6 +7,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview --host 0.0.0.0",
+    "test": "node --test src/auth/auth.test.ts src/api/client.test.ts src/stores/session.test.ts",
     "typecheck": "vue-tsc -b",
     "lint": "eslint \"src/**/*.{ts,vue}\""
   },

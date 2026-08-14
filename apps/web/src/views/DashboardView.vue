@@ -1,6 +1,70 @@
+<script setup lang="ts">
+import { computed, onMounted, ref } from "vue";
+import type { DashboardOverview } from "@assessment/shared";
+import { api } from "@/api/client";
+import { hasPermission } from "@/auth/roles";
+import { useSessionStore } from "@/stores/session";
+
+const session = useSessionStore();
+const overview = ref<DashboardOverview | null>(null);
+const loading = ref(true);
+const error = ref("");
+
+const canCreateCourse = computed(() => hasPermission(session.profile?.role, "course:create"));
+
+async function load() {
+  loading.value = true;
+  error.value = "";
+  try {
+    overview.value = await api.overview();
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : "总览数据读取失败";
+  } finally {
+    loading.value = false;
+  }
+}
+
+onMounted(load);
+</script>
+
 <template>
-  <div class="page-head"><div><span class="eyebrow">总览 / 2026 春季学期</span><h1>考核指挥台</h1><p>从学习参与到评价结果，观察全校思政理论学习质量。</p></div><button class="button primary">发布学习任务</button></div>
-  <div class="flow-track"><div v-for="(s,i) in ['任务发布','章节学习','过程记录','在线考试','阅卷复核','积分与报告']" :key="s" class="flow-step"><b>0{{i+1}}</b><strong>{{s}}</strong><span>{{[12,86,3248,3,28,1240][i]}} {{i===0?'项':i===1?'%完成':i===2?'条':i===3?'场':i===4?'份待处理':'份已生成'}}</span></div></div>
-  <div class="metric-grid" style="margin-top:18px"><div class="metric"><label>学习任务完成率</label><strong>86.4%</strong><small>较上周 +4.2%</small></div><div class="metric"><label>考试综合通过率</label><strong>91.2%</strong><small>目标线 90%</small></div><div class="metric"><label>待人工阅卷</label><strong>28</strong><small class="danger">2 个批次临近截止</small></div><div class="metric"><label>学习积分发放</label><strong>12,480</strong><small>本学期累计</small></div></div>
-  <div class="grid-2"><section class="panel"><div class="panel-head"><h2>院系学习完成率</h2><span>目标线 85%</span></div><div class="panel-body chart-bars"><div v-for="(x,i) in [93,88,85,79,76,71]" :key="i"><b>{{x}}%</b><i :style="{height:x+'%'}"></i><span>{{['马院','法学院','经管院','文学院','理学院','工学院'][i]}}</span></div></div></section><section class="panel"><div class="panel-head"><h2>今日重点事项</h2><span>按风险优先级排序</span></div><div class="panel-body timeline"><div class="timeline-row"><time>09:00</time><i class="timeline-dot"></i><div><strong>党史学习任务即将截止</strong><span>24 名学生未完成，已发送提醒</span></div></div><div class="timeline-row"><time>14:00</time><i class="timeline-dot"></i><div><strong>期末考试开始</strong><span>预计 520 人同时在线</span></div></div><div class="timeline-row"><time>18:00</time><i class="timeline-dot"></i><div><strong>主观题阅卷截止</strong><span>当前完成率 74%</span></div></div></div></section></div>
+  <div class="page-head">
+    <div>
+      <span class="eyebrow">总览 / 当前学期</span>
+      <h1>考核工作总览</h1>
+      <p>汇总当前账号数据范围内的课程、考试、审核任务和学习风险。</p>
+    </div>
+    <router-link v-if="canCreateCourse" class="button primary button-link" to="/courses?create=1">创建课程</router-link>
+    <button v-else class="button" type="button" :disabled="loading" @click="load">{{ loading ? "正在刷新..." : "刷新数据" }}</button>
+  </div>
+
+  <div v-if="loading" class="state-panel" aria-busy="true">正在读取当前角色的学评数据...</div>
+  <div v-else-if="error" class="state-panel error-state" role="alert">
+    <strong>总览数据未能载入</strong>
+    <span>{{ error }}</span>
+    <button class="button" type="button" @click="load">重新读取</button>
+  </div>
+  <template v-else-if="overview">
+    <div class="flow-track">
+      <div v-for="(item, index) in [
+        { label: '课程建设', value: overview.courseCount, unit: '门课程' },
+        { label: '学习参与', value: overview.learnerCount, unit: '名学习者' },
+        { label: '考试组织', value: overview.examCount, unit: '场考试' },
+        { label: '完成情况', value: overview.completionRate, unit: '% 完成' },
+        { label: '审核处理', value: overview.pendingReviews, unit: '项待处理' },
+        { label: '风险跟进', value: overview.riskAlerts, unit: '项预警' }
+      ]" :key="item.label" class="flow-step">
+        <b>0{{ index + 1 }}</b>
+        <strong>{{ item.label }}</strong>
+        <span>{{ item.value }} {{ item.unit }}</span>
+      </div>
+    </div>
+
+    <div class="metric-grid dashboard-metrics">
+      <div class="metric"><label>课程数量</label><strong>{{ overview.courseCount }}</strong><small>当前数据范围</small></div>
+      <div class="metric"><label>考试数量</label><strong>{{ overview.examCount }}</strong><small>已纳入考核计划</small></div>
+      <div class="metric"><label>考试通过率</label><strong>{{ overview.passRate }}%</strong><small>按已提交成绩统计</small></div>
+      <div class="metric"><label>待处理事项</label><strong>{{ overview.pendingReviews + overview.riskAlerts }}</strong><small>审核与学习风险合计</small></div>
+    </div>
+  </template>
 </template>

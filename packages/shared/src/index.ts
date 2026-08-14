@@ -1,11 +1,18 @@
-export type RoleCode =
-  | "platform_admin"
-  | "org_admin"
-  | "course_admin"
-  | "question_admin"
-  | "supervisor"
-  | "learner"
-  | "auditor";
+export const ROLE_CODES = [
+  "platform_admin",
+  "org_admin",
+  "course_admin",
+  "question_admin",
+  "supervisor",
+  "learner",
+  "auditor"
+] as const;
+
+export type RoleCode = (typeof ROLE_CODES)[number];
+
+export function isRoleCode(value: string): value is RoleCode {
+  return ROLE_CODES.includes(value as RoleCode);
+}
 
 export type CourseStatus = "draft" | "published" | "archived";
 export type ExamStatus = "draft" | "published" | "running" | "closed";
@@ -52,6 +59,7 @@ export interface QuestionSummary {
   difficulty: "easy" | "medium" | "hard";
   stem: string;
   score: number;
+  status: "pending_review" | "published" | "archived";
 }
 
 export interface ExamPlanSummary {
@@ -88,7 +96,36 @@ export interface ExamResult {
     questionId: string;
     score: number;
     correct: boolean;
+    feedback?: string;
+    knowledgePoints?: string[];
   }>;
+}
+
+export interface ClassResultSummary {
+  learnerId: string;
+  learnerName: string;
+  className: string;
+  latestCourseId?: string;
+  latestCourseTitle?: string;
+  latestExamTitle?: string;
+  latestScore: number | null;
+  latestPassed: boolean | null;
+  status: "not_started" | "passed" | "needs_support";
+  mastery: number;
+  wrongCount: number;
+  pendingTasks: number;
+  lastSubmittedAt: string | null;
+}
+
+export interface LearningIntervention {
+  id: string;
+  learnerId: string;
+  learnerName: string;
+  title: string;
+  knowledgePoint: string;
+  reason: string;
+  priority: "low" | "medium" | "high";
+  createdAt: string;
 }
 
 export interface AuditLogItem {

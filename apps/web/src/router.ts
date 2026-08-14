@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { getToken } from "@/api/client";
 import DashboardView from "@/views/DashboardView.vue";
 import LoginView from "@/views/LoginView.vue";
 import CoursesView from "@/views/CoursesView.vue";
@@ -10,35 +9,43 @@ import ReportsView from "@/views/ReportsView.vue";
 import WorkflowView from "@/views/WorkflowView.vue";
 import AcceptanceView from "@/views/AcceptanceView.vue";
 import LearningProfileView from "@/views/LearningProfileView.vue";
-import type { RoleCode, UserProfile } from "@assessment/shared";
-
-const readProfile = () => JSON.parse(localStorage.getItem("assessment_profile") ?? "null") as UserProfile | null;
-const canAccess = (roles: RoleCode[] | undefined, role: RoleCode | undefined) => !roles?.length || Boolean(role && roles.includes(role));
+import ClassResultsView from "@/views/ClassResultsView.vue";
+import { hasPermission, homePathForRole, type PermissionCode } from "@/auth/roles";
+import { useSessionStore } from "@/stores/session";
 
 export const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: "/login", component: LoginView },
+    { path: "/login", component: LoginView, meta: { public: true } },
     { path: "/", redirect: "/dashboard" },
-    { path: "/dashboard", component: DashboardView },
-    { path: "/profile", component: LearningProfileView },
-    { path: "/courses", component: CoursesView },
-    { path: "/records", component: WorkflowView, props: { mode: "records" } },
-    { path: "/questions", component: QuestionsView, meta: { roles: ["platform_admin", "course_admin"] } },
-    { path: "/exams", component: ExamsView },
-    { path: "/exams/:id/attempt", component: ExamAttemptView, meta: { roles: ["learner"] } },
-    { path: "/marking", component: WorkflowView, props: { mode: "marking" }, meta: { roles: ["platform_admin", "course_admin", "supervisor"] } },
-    { path: "/reports", component: ReportsView, meta: { roles: ["platform_admin", "course_admin", "supervisor"] } },
-    { path: "/acceptance", component: AcceptanceView, meta: { roles: ["platform_admin"] } }
+    { path: "/dashboard", component: DashboardView, meta: { permission: "dashboard:view" } },
+    { path: "/profile", component: LearningProfileView, meta: { permission: "profile:view" } },
+    { path: "/courses", component: CoursesView, meta: { permission: "course:view" } },
+    { path: "/records", component: WorkflowView, props: { mode: "records" }, meta: { permission: "record:view" } },
+    { path: "/questions", component: QuestionsView, meta: { permission: "question:view" } },
+    { path: "/exams", component: ExamsView, meta: { permission: "exam:view" } },
+    { path: "/exams/:id/attempt", component: ExamAttemptView, meta: { permission: "exam:attempt" } },
+    { path: "/marking", component: WorkflowView, props: { mode: "marking" }, meta: { permission: "review:view" } },
+    { path: "/reports", component: ReportsView, meta: { permission: "report:view" } },
+    { path: "/class-results", component: ClassResultsView, meta: { permission: "class-results:view" } },
+    { path: "/acceptance", component: AcceptanceView, meta: { permission: "audit:view" } }
   ]
 });
 
-router.beforeEach((to) => {
-  if (to.path !== "/login" && !getToken()) return "/login";
-  if (to.path === "/login" && getToken()) return "/dashboard";
-  const profile = readProfile();
-  if (to.path !== "/login" && !canAccess(to.meta.roles as RoleCode[] | undefined, profile?.role)) {
-    return "/dashboard";
+router.beforeEach(async (to) => {
+  const session = useSessionStore();
+  await session.restore();
+
+  if (to.meta.public) {
+    return session.profile ? homePathForRole(session.profile.role) : true;
+  }
+  if (!session.profile) {
+    return { path: "/login", query: { redirect: to.fullPath } };
+  }
+  const permission = to.meta.permission as PermissionCode | undefined;
+  if (!hasPermission(session.profile.role, permission)) {
+    session.showPermissionDenied("当前角色无权访问该功能，已返回可用工作台。");
+    return homePathForRole(session.profile.role);
   }
   return true;
 });

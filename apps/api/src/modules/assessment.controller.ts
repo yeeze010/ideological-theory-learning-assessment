@@ -1,23 +1,18 @@
 import { Body, Controller, Get, Param, Post, Req, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import type { Request } from "express";
-import type { UserProfile } from "@assessment/shared";
 import { AssessmentService } from "./assessment.service";
 import { AuthGuard } from "./auth.guard";
-import { CreateCourseDto, CreateQuestionDto, LoginDto, SubmitExamDto } from "./dto";
+import type { AuthenticatedUser } from "./auth.types";
+import { CreateCourseDto, CreateExamPlanDto, CreateInterventionDto, CreateQuestionDto, SubmitExamDto } from "./dto";
 import { Roles } from "./roles.decorator";
 
-type AuthenticatedRequest = Request & { user: UserProfile };
+type AuthenticatedRequest = Request & { user: AuthenticatedUser };
 
 @ApiTags("assessment")
 @Controller()
 export class AssessmentController {
   constructor(private readonly service: AssessmentService) {}
-
-  @Post("auth/login")
-  login(@Body() dto: LoginDto) {
-    return this.service.login(dto.role, dto.username, dto.password);
-  }
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
@@ -43,18 +38,42 @@ export class AssessmentController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  @Roles("platform_admin", "org_admin", "course_admin", "question_admin")
-  @Get("questions")
-  listQuestions() {
-    return this.service.listQuestions();
+  @Roles("platform_admin", "org_admin", "course_admin")
+  @Post("courses/:id/publish")
+  publishCourse(@Param("id") id: string, @Req() request: AuthenticatedRequest) {
+    return this.service.publishCourse(id, request.user);
   }
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  @Roles("platform_admin", "org_admin", "question_admin")
+  @Roles("platform_admin", "org_admin", "course_admin", "question_admin")
+  @Get("questions")
+  listQuestions(@Req() request: AuthenticatedRequest) {
+    return this.service.listQuestions(request.user);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Roles("platform_admin", "org_admin", "course_admin", "question_admin")
   @Post("questions")
   createQuestion(@Body() dto: CreateQuestionDto, @Req() request: AuthenticatedRequest) {
     return this.service.createQuestion(dto, request.user);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Roles("platform_admin", "org_admin", "course_admin", "question_admin")
+  @Post("questions/:id/publish")
+  publishQuestion(@Param("id") id: string, @Req() request: AuthenticatedRequest) {
+    return this.service.publishQuestion(id, request.user);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Roles("platform_admin", "org_admin", "course_admin")
+  @Post("exam-plans")
+  createExamPlan(@Body() dto: CreateExamPlanDto, @Req() request: AuthenticatedRequest) {
+    return this.service.createExamPlan(dto, request.user);
   }
 
   @ApiBearerAuth()
@@ -66,10 +85,26 @@ export class AssessmentController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
+  @Roles("platform_admin", "org_admin", "course_admin", "supervisor")
+  @Get("learning/class-results")
+  classResults(@Req() request: AuthenticatedRequest) {
+    return this.service.classResults(request.user);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Roles("platform_admin", "org_admin", "course_admin", "supervisor")
+  @Post("learning/interventions")
+  createIntervention(@Body() dto: CreateInterventionDto, @Req() request: AuthenticatedRequest) {
+    return this.service.createIntervention(dto, request.user);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Roles("platform_admin", "org_admin", "course_admin", "supervisor", "auditor")
   @Get("audit-logs")
-  listAuditLogs() {
-    return this.service.listAuditLogs();
+  listAuditLogs(@Req() request: AuthenticatedRequest) {
+    return this.service.listAuditLogs(request.user);
   }
 
   @ApiBearerAuth()

@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": "../..",
+    "types": ["jest", "node"],
+    "paths": {
+      "@assessment/shared": ["packages/shared/src/index.ts"]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts",
+    "../../packages/shared/src/**/*.ts"
+  ]
+}

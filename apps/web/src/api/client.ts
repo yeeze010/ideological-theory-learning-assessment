@@ -5,7 +5,9 @@ import type {
   ExamPlanSummary,
   ExamResult,
   AuditLogItem,
+  ClassResultSummary,
   LearningAlert,
+  LearningIntervention,
   LearningProfile,
   LearningRecommendation,
   QuestionSummary,
@@ -14,11 +16,32 @@ import type {
   UserProfile
 } from "@assessment/shared";
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? "/api";
+const API_BASE = import.meta.env?.VITE_API_BASE ?? "/api";
 
 interface LoginResponse {
   token: string;
   profile: UserProfile;
+}
+
+interface ApiHandlers {
+  unauthorized?: () => void;
+  forbidden?: (message: string) => void;
+}
+
+let handlers: ApiHandlers = {};
+
+export class ApiError extends Error {
+  readonly status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
+export function configureApiHandlers(nextHandlers: ApiHandlers) {
+  handlers = nextHandlers;
 }
 
 export function getToken() {
@@ -46,9 +69,20 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     headers
   });
   if (!response.ok) {
-    const message = await response.text();
-    throw new Error(message || `请求失败：${response.status}`);
+    const raw = await response.text();
+    let message = raw || `请求失败：${response.status}`;
+    try {
+      const payload = JSON.parse(raw) as { message?: string | string[] };
+      if (Array.isArray(payload.message)) message = payload.message.join("；");
+      else if (payload.message) message = payload.message;
+    } catch {
+      // Non-JSON failures retain the response text.
+    }
+    if (response.status === 401) handlers.unauthorized?.();
+    if (response.status === 403) handlers.forbidden?.(message);
+    throw new ApiError(message, response.status);
   }
+  if (response.status === 204) return undefined as T;
   return response.json() as Promise<T>;
 }
 
@@ -58,6 +92,10 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ role, username, password })
     });
+  },
+  async me() {
+    const data = await request<UserProfile | { profile: UserProfile }>("/auth/me");
+    return "profile" in data ? data.profile : data;
   },
   overview() {
     return request<DashboardOverview>("/dashboard/overview");
@@ -71,6 +109,9 @@ export const api = {
       body: JSON.stringify(payload)
     });
   },
+  publishCourse(id: string) {
+    return request<CourseSummary>(`/courses/${id}/publish`, { method: "POST" });
+  },
   questions() {
     return request<QuestionSummary[]>("/questions");
   },
@@ -79,6 +120,20 @@ export const api = {
       method: "POST",
       body: JSON.stringify(payload)
     });
+  },
+  publishQuestion(id: string) {
+    return request<QuestionSummary>(`/questions/${id}/publish`, { method: "POST" });
+  },
+  createExamPlan(payload: {
+    courseId: string;
+    title: string;
+    questionIds: string[];
+    durationMinutes: number;
+    passScore: number;
+    startAt: string;
+    endAt: string;
+  }) {
+    return request<ExamPlanSummary>("/exam-plans", { method: "POST", body: JSON.stringify(payload) });
   },
   exams() {
     return request<ExamPlanSummary[]>("/exam-plans");
@@ -103,6 +158,23 @@ export const api = {
   },
   learningAlerts() {
     return request<LearningAlert[]>("/learning/alerts");
+  },
+  classResults() {
+    return request<ClassResultSummary[]>("/learning/class-results");
+  },
+  createIntervention(payload: {
+    learnerId: string;
+    courseId?: string;
+    sourceAttemptId?: string;
+    title: string;
+    knowledgePoint: string;
+    reason: string;
+    priority: "low" | "medium" | "high";
+  }) {
+    return request<LearningIntervention>("/learning/interventions", {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
   },
   pendingReviews() {
     return request<ReviewTask[]>("/reviews/pending");

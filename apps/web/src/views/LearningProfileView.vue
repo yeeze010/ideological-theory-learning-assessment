@@ -11,12 +11,14 @@ const alerts = ref<LearningAlert[]>([]);
 const reviews = ref<ReviewTask[]>([]);
 const loading = ref(true);
 const message = ref("");
+const error = ref("");
 
 const isLearner = computed(() => session.profile?.role === "learner");
 
 async function load() {
   loading.value = true;
   message.value = "";
+  error.value = "";
   try {
     profile.value = await api.learningProfile();
     recommendations.value = await api.learningRecommendations();
@@ -24,15 +26,22 @@ async function load() {
       alerts.value = await api.learningAlerts();
       reviews.value = await api.pendingReviews();
     }
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : "学习画像读取失败";
   } finally {
     loading.value = false;
   }
 }
 
 async function approve(id: string) {
-  const result = await api.approveReview(id);
-  message.value = `${result.title} 已审核通过`;
-  await load();
+  error.value = "";
+  try {
+    const result = await api.approveReview(id);
+    await load();
+    message.value = `${result.title} 已审核通过`;
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : "审核操作失败";
+  }
 }
 
 onMounted(load);
@@ -47,6 +56,13 @@ onMounted(load);
     </div>
     <button class="button" :disabled="loading" @click="load">刷新画像</button>
   </div>
+
+  <div v-if="loading" class="state-panel" aria-busy="true">正在汇总学习画像...</div>
+  <div v-else-if="error && !profile" class="state-panel error-state" role="alert">
+    <strong>学习画像未能载入</strong><span>{{ error }}</span>
+    <button class="button" type="button" @click="load">重新读取</button>
+  </div>
+  <p v-else-if="error" class="form-alert" role="alert">{{ error }}</p>
 
   <template v-if="profile">
     <div class="metric-grid">
