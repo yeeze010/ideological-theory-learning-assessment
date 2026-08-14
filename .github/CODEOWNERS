@@ -1,0 +1,7 @@
+* @project-admin
+
+/apps/api/ @backend-owner
+/apps/web/ @frontend-owner
+/packages/shared/ @backend-owner @frontend-owner
+/docs/ @pm-owner @qa-owner
+/deliverables/ @pm-owner @qa-owner

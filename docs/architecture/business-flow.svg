@@ -1,0 +1,23 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <style>
+      text{font-family:Arial,'Microsoft YaHei',sans-serif;fill:#e5e7eb}.title{font-size:30px;font-weight:700}.note{font-size:14px;fill:#94a3b8}.node{fill:#111827;stroke:#38bdf8;stroke-width:2;rx:16}.hot{fill:#1f2937;stroke:#f87171;stroke-width:2;rx:16}.label{font-size:17px;font-weight:700}.small{font-size:13px;fill:#cbd5e1}.line{stroke:#64748b;stroke-width:2;marker-end:url(#arrow)}
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#64748b"/></marker>
+  </defs>
+  <rect width="1280" height="720" fill="#0b1220"/>
+  <text x="60" y="58" class="title">核心业务流程图</text><text x="60" y="86" class="note">学习任务、课程章节、学习记录、考试阅卷、积分评价、统计报告闭环</text>
+  <rect x="60" y="160" width="170" height="92" class="hot"/><text x="92" y="195" class="label">创建课程章节</text><text x="90" y="225" class="small">课件、附件、完成规则</text>
+  <rect x="280" y="160" width="170" height="92" class="node"/><text x="318" y="195" class="label">发布学习任务</text><text x="315" y="225" class="small">范围、期限、提醒</text>
+  <rect x="500" y="160" width="170" height="92" class="node"/><text x="535" y="195" class="label">学生章节学习</text><text x="535" y="225" class="small">进度、时长、测验</text>
+  <rect x="720" y="160" width="170" height="92" class="node"/><text x="760" y="195" class="label">形成学习记录</text><text x="750" y="225" class="small">个人、班级、院系口径</text>
+  <rect x="940" y="160" width="170" height="92" class="hot"/><text x="990" y="195" class="label">报表与告警</text><text x="978" y="225" class="small">完成率、低进度提醒</text>
+  <rect x="60" y="410" width="170" height="92" class="hot"/><text x="105" y="445" class="label">题库维护</text><text x="92" y="475" class="small">题型、难度、审核</text>
+  <rect x="280" y="410" width="170" height="92" class="node"/><text x="326" y="445" class="label">策略组卷</text><text x="315" y="475" class="small">固定卷、随机卷</text>
+  <rect x="500" y="410" width="170" height="92" class="node"/><text x="542" y="445" class="label">在线考试</text><text x="530" y="475" class="small">答题、保存、交卷</text>
+  <rect x="720" y="410" width="170" height="92" class="node"/><text x="752" y="445" class="label">自动/人工阅卷</text><text x="755" y="475" class="small">客观题、主观题、复核</text>
+  <rect x="940" y="410" width="170" height="92" class="hot"/><text x="982" y="445" class="label">积分证书报告</text><text x="970" y="475" class="small">评价、PDF、学习报告</text>
+  <line x1="230" y1="206" x2="280" y2="206" class="line"/><line x1="450" y1="206" x2="500" y2="206" class="line"/><line x1="670" y1="206" x2="720" y2="206" class="line"/><line x1="890" y1="206" x2="940" y2="206" class="line"/>
+  <line x1="230" y1="456" x2="280" y2="456" class="line"/><line x1="450" y1="456" x2="500" y2="456" class="line"/><line x1="670" y1="456" x2="720" y2="456" class="line"/><line x1="890" y1="456" x2="940" y2="456" class="line"/>
+  <line x1="1025" y1="252" x2="1025" y2="410" class="line"/><text x="1042" y="335" class="note">统计驱动改进</text>
+</svg>
